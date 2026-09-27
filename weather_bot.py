@@ -28,10 +28,10 @@ TEMPERATURE_URL = (
 # REGIONAL REFERENCE POINTS
 # ==========================================================
 #
-# These points are used to organise stations and forecast
-# locations into broad North / East / South / West / Central
-# groups for easier reading.
+# Used to group stations and forecast areas into:
+# North / East / South / West / Central
 #
+# These are approximate groupings for easier reading.
 # They are NOT official NEA administrative boundaries.
 #
 # ==========================================================
@@ -291,7 +291,7 @@ def create_station_lookup(stations):
 
 
 # ==========================================================
-# RAINFALL SECTION
+# CURRENT RAINFALL STATUS
 # ==========================================================
 
 def create_rainfall_section(data):
@@ -309,8 +309,8 @@ def create_rainfall_section(data):
     if not readings:
 
         return (
-            "🌧️ RAIN DETECTED NOW\n"
-            "Actual rainfall measured by weather stations\n\n"
+            "🌧️ CURRENT RAINFALL STATUS\n"
+            "Latest rainfall measurements from weather stations\n\n"
             "Rainfall data is currently unavailable.\n"
         )
 
@@ -353,8 +353,8 @@ def create_rainfall_section(data):
         if not station:
             continue
 
-        # Only display locations where rain
-        # was actually measured.
+        # Only show stations where rainfall
+        # was measured in the latest reading.
         if value is not None and value > 0:
 
             region = station["region"]
@@ -365,8 +365,8 @@ def create_rainfall_section(data):
             })
 
     message = (
-        "🌧️ RAIN DETECTED NOW\n"
-        "Actual rainfall measured by weather stations\n"
+        "🌧️ CURRENT RAINFALL STATUS\n"
+        "Latest rainfall measurements from weather stations\n"
         f"🕐 Latest 5-min reading: "
         f"{format_timestamp(timestamp)}\n\n"
     )
@@ -407,15 +407,16 @@ def create_rainfall_section(data):
     if not rain_found:
 
         message += (
-            "✅ No rainfall was detected at the "
-            "reporting weather stations.\n\n"
+            "✅ No rainfall was measured at the "
+            "reporting weather stations during "
+            "the latest 5-minute reading.\n\n"
         )
 
     return message
 
 
 # ==========================================================
-# TEMPERATURE SECTION
+# CURRENT TEMPERATURE
 # ==========================================================
 
 def create_temperature_section(data):
@@ -576,7 +577,7 @@ def create_temperature_section(data):
 
 
 # ==========================================================
-# 2-HOUR FORECAST SECTION
+# NEXT 2 HOURS FORECAST
 # ==========================================================
 
 def create_forecast_section(data):
@@ -688,8 +689,8 @@ def create_forecast_section(data):
 
     message = (
         "🌦️ NEXT 2 HOURS — FORECAST\n"
-        "Expected weather conditions — not necessarily "
-        "raining at this moment\n"
+        "Expected weather conditions — "
+        "not necessarily happening right now\n"
         f"🕐 Forecast period: "
         f"{valid_period.get('text', 'Not available')}\n"
         f"🗓️ Forecast updated: "

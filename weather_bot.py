@@ -28,8 +28,9 @@ TEMPERATURE_URL = (
 # REGIONAL REFERENCE POINTS
 # ==========================================================
 #
-# These are used only to organise weather stations and
-# forecast areas into easy-to-read broad regions.
+# These points are used to organise stations and forecast
+# locations into broad North / East / South / West / Central
+# groups for easier reading.
 #
 # They are NOT official NEA administrative boundaries.
 #
@@ -82,7 +83,7 @@ REGION_ORDER = [
 
 
 # ==========================================================
-# GET REGION FROM LATITUDE / LONGITUDE
+# DETERMINE REGION FROM COORDINATES
 # ==========================================================
 
 def get_region(latitude, longitude):
@@ -290,7 +291,7 @@ def create_station_lookup(stations):
 
 
 # ==========================================================
-# FORMAT RAINFALL SECTION
+# RAINFALL SECTION
 # ==========================================================
 
 def create_rainfall_section(data):
@@ -308,7 +309,8 @@ def create_rainfall_section(data):
     if not readings:
 
         return (
-            "🌧️ RAINFALL NOW\n\n"
+            "🌧️ RAIN DETECTED NOW\n"
+            "Actual rainfall measured by weather stations\n\n"
             "Rainfall data is currently unavailable.\n"
         )
 
@@ -351,7 +353,8 @@ def create_rainfall_section(data):
         if not station:
             continue
 
-        # Only show stations where rain is detected
+        # Only display locations where rain
+        # was actually measured.
         if value is not None and value > 0:
 
             region = station["region"]
@@ -362,8 +365,9 @@ def create_rainfall_section(data):
             })
 
     message = (
-        "🌧️ RAINFALL DETECTED\n"
-        f"Latest 5-min reading: "
+        "🌧️ RAIN DETECTED NOW\n"
+        "Actual rainfall measured by weather stations\n"
+        f"🕐 Latest 5-min reading: "
         f"{format_timestamp(timestamp)}\n\n"
     )
 
@@ -403,7 +407,7 @@ def create_rainfall_section(data):
     if not rain_found:
 
         message += (
-            "✅ No rainfall detected at the "
+            "✅ No rainfall was detected at the "
             "reporting weather stations.\n\n"
         )
 
@@ -411,7 +415,7 @@ def create_rainfall_section(data):
 
 
 # ==========================================================
-# FORMAT TEMPERATURE SECTION
+# TEMPERATURE SECTION
 # ==========================================================
 
 def create_temperature_section(data):
@@ -429,7 +433,7 @@ def create_temperature_section(data):
     if not readings:
 
         return (
-            "🌡️ TEMPERATURE\n\n"
+            "🌡️ CURRENT TEMPERATURE\n\n"
             "Temperature data is currently unavailable.\n"
         )
 
@@ -488,8 +492,9 @@ def create_temperature_section(data):
         )
 
     message = (
-        "🌡️ TEMPERATURE\n"
-        f"Latest reading: "
+        "🌡️ CURRENT TEMPERATURE\n"
+        "Actual readings from weather stations\n"
+        f"🕐 Latest reading: "
         f"{format_timestamp(timestamp)}\n\n"
     )
 
@@ -558,7 +563,6 @@ def create_temperature_section(data):
             f"{highest:.1f}°C\n"
         )
 
-        # Show individual station readings
         for station in region_readings:
 
             message += (
@@ -572,7 +576,7 @@ def create_temperature_section(data):
 
 
 # ==========================================================
-# FORMAT 2-HOUR FORECAST
+# 2-HOUR FORECAST SECTION
 # ==========================================================
 
 def create_forecast_section(data):
@@ -590,7 +594,8 @@ def create_forecast_section(data):
     if not items:
 
         return (
-            "🌦️ 2-HOUR FORECAST\n\n"
+            "🌦️ NEXT 2 HOURS — FORECAST\n"
+            "Expected weather conditions\n\n"
             "Forecast currently unavailable.\n"
         )
 
@@ -682,9 +687,12 @@ def create_forecast_section(data):
         )
 
     message = (
-        "🌦️ 2-HOUR FORECAST\n"
-        f"🕐 {valid_period.get('text', 'Not available')}\n"
-        f"🗓️ Updated: "
+        "🌦️ NEXT 2 HOURS — FORECAST\n"
+        "Expected weather conditions — not necessarily "
+        "raining at this moment\n"
+        f"🕐 Forecast period: "
+        f"{valid_period.get('text', 'Not available')}\n"
+        f"🗓️ Forecast updated: "
         f"{format_timestamp(update_timestamp)}\n\n"
     )
 
@@ -711,7 +719,7 @@ def create_forecast_section(data):
             )
 
             message += (
-                f"{emoji} {condition}\n"
+                f"{emoji} Expected: {condition}\n"
             )
 
             message += (
@@ -851,7 +859,7 @@ def main():
     try:
 
         # ==========================================
-        # GET DATA
+        # GET WEATHER DATA
         # ==========================================
 
         rainfall_data = (
@@ -868,7 +876,7 @@ def main():
 
 
         # ==========================================
-        # BUILD MESSAGE
+        # CREATE MESSAGE SECTIONS
         # ==========================================
 
         rainfall_section = (
@@ -889,20 +897,31 @@ def main():
             )
         )
 
+
+        # ==========================================
+        # BUILD FINAL MESSAGE
+        # ==========================================
+
         message = (
             "🇸🇬 SINGAPORE WEATHER UPDATE\n\n"
+
             + rainfall_section
             + "\n"
+
             + temperature_section
             + "\n"
+
             + forecast_section
             + "\n"
-            + "Source: NEA / data.gov.sg 🇸🇬"
+
+            + "Source: NEA / data.gov.sg 🇸🇬\n"
+            + "Regional grouping is approximate "
+              "for easier reading."
         )
 
 
         # ==========================================
-        # PRINT TO GITHUB LOG
+        # PRINT MESSAGE IN GITHUB ACTIONS LOG
         # ==========================================
 
         print()
@@ -911,7 +930,7 @@ def main():
 
 
         # ==========================================
-        # SEND TELEGRAM MESSAGE
+        # SEND MESSAGE TO TELEGRAM
         # ==========================================
 
         send_telegram_message(
@@ -919,9 +938,11 @@ def main():
         )
 
         print()
+
         print(
             "Weather bot completed successfully."
         )
+
 
     except Exception as error:
 

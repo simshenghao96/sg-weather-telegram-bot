@@ -1,0 +1,32 @@
+name: Run Singapore Weather Bot
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-weather-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Get repository files
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Step 3: Install Python requirements
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Step 4: Run weather bot
+      - name: Run weather bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python weather_bot.py

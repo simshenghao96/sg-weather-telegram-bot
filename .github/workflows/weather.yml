@@ -1,7 +1,12 @@
 name: Run Singapore Weather Bot
 
 on:
+  # Allows manual testing
   workflow_dispatch:
+
+  # Runs automatically every hour
+  schedule:
+    - cron: "0 * * * *"
 
 jobs:
   run-weather-bot:
@@ -18,7 +23,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Step 3: Install Python requirements
+      # Step 3: Install requirements
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
